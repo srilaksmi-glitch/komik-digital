@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Komik Interaktif Pecahan</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- ================= PEMBUKA ================= -->
+<div id="welcome">
+  <h1>📘 Komik Pecahan Interaktif</h1>
+  <p>
+    Selamat datang di komik interaktif operasi pecahan.<br>
+    Ayo belajar Operasi Hitung Pecahan yang Menyenangkan!
+  </p>
+  <button onclick="mulai()">📖 Baca Komik</button>
+</div>
+
+<!-- ================= NAVIGASI ================= -->
+<div id="nav">
+  <button onclick="prev()">⬅ Prev</button>
+  <button onclick="next()">Next ➡</button>
+</div>
+
+<!-- ================= BUKU ================= -->
+<div id="book">
+  <img id="page">
+
+  <div id="ggb-container">
+    <iframe id="ggb" allowfullscreen></iframe>
+  </div>
+</div>
+
+<!-- ================= SOAL CERITA ================= -->
+<div id="quiz">
+  <h2 id="quizTitle">Soal Cerita</h2>
+  <p id="qText"></p>
+
+  <button id="optA" onclick="jawab('A')"></button>
+  <button id="optB" onclick="jawab('B')"></button>
+  <button id="optC" onclick="jawab('C')"></button>
+
+  <p id="feedback"></p>
+  <button id="nextSoalBtn" onclick="lanjutSet()">Lanjutkan Membaca Komik</button>
+</div>
+
+<!-- ================= PENUTUP ================= -->
+<div id="penutup">
+  <h2>Terima Kasih 🙏</h2>
+  <p>Komik Interaktif Operasi Pecahan</p>
+  <p>Nama: Ni Luh Putu Sri Laksmi</p>
+  <p>NIM: 2313011006</p>
+  <p>Program Studi: Pendidikan Matematika</p>
+
+  <h2>Special Thanks:</h2h2>
+  <p>Dosen Pembimbing: Prof. Dr. I Made Candiasa, M.I.Kom</p>
+  <p>Teman-Teman Kelas 5A Matematika Multimedia: Ratih, Rangga, Bertha</p>
+  <button onclick="location.reload()">🔁 Baca Ulang Komik</button>
+</div>
+
+<script>
+/* ================= DATA HALAMAN ================= */
+let step = 0;
+let modeSoal = false;
+let soalIndex = 0;
+let salah = 0;
+let setAktif = null;
+
+/* ===== GAMBAR KOMIK ===== */
+const pages = {
+  1:"Pjtf/1.webp",2:"Pjtf/2.webp",3:"Pjtf/3.webp",
+  5:"Pjtf/4.webp",6:"Pjtf/5.webp",7:"Pjtf/6.webp",8:"Pjtf/7.webp",
+  10:"Pjtf/8.webp",11:"Pjtf/9.webp",12:"Pjtf/10.webp",
+  14:"Pjtf/11.webp",15:"Pjtf/12.webp",16:"Pjtf/13.webp"
+};
+
+/* ===== GEOGEBRA ===== */
+const geogebra = {
+  4:"https://www.geogebra.org/classic/mguyzsbw?embed",
+  9:"https://www.geogebra.org/classic/cac2zfaj?embed",
+  13:"https://www.geogebra.org/classic/qphkpcfk?embed"
+};
+
+/* ===== SOAL CERITA ===== */
+const soal = {
+4:[
+{q:"Ani memiliki 1/2 meter pita lalu membeli lagi 1/4 meter. Berapa panjang pita Ani sekarang?",
+ A:"3/4 meter",B:"2/6 meter",C:"1/6 meter",b:"A"},
+{q:"Ibu memakai 3/4 liter minyak dan tersisa 1/4 liter. Berapa liter minyak semula?",
+ A:"1/3 liter",B:"1/2 liter",C:"1 liter",b:"C"},
+{q:"Doni minum 2/3 liter susu lalu 1/6 liter lagi. Berapa total susu?",
+ A:"5/3 liter",B:"5/6 liter",C:"3/6 liter",b:"B"}
+],
+9:[
+{q:"Satu kotak berisi 1/2 kg gula. Ibu membeli 3 kotak. Berapa kg gula seluruhnya?",
+ A:"3/2 kg",B:"3/4 kg",C:"1/2 kg",b:"A"},
+{q:"Andi memakan 1/2 dari 2/3 semangka. Berapa bagian yang telah dimakan?",
+ A:"1/4",B:"2/6",C:"1/6",b:"B"},
+{q:"Rani memakai 3/5 m kain untuk 2/4 baju. Berapa kain yang dipakai?",
+ A:"2/5 m",B:"6/15 m",C:"3/5 m",b:"C"}
+],
+13:[
+{q:"Ibu punya 1/2 kg tepung dan membaginya masing-masing 1/4 kg. Berapa banyak kantong yang dihasilkan?",
+ A:"2 kantong",B:"1/2 kantong",C:"1/8 kantong",b:"A"},
+{q:"Pak Budi memiliki 2/3 m tali dipotong 1/3 m. Ada berapa potong?",
+ A:"3 potong",B:"2 potong",C:"1 potong",b:"B"},
+{q:"Siti punya 4/5 liter sirup dan dituangkan 3/5 liter per gelas. Ada berapa gelas?",
+ A:"4/3 gelas",B:"8/25 gelas",C:"3/4 gelas",b:"A"}
+],
+17:[
+{q:"Ani punya 1/2 kue lalu membeli lagi 1/4 kue. Berapa banyak kue Ani sekarang?",
+ A:"3/4 kue",B:"2/6 kue",C:"1/6 kue",b:"A"},
+{q:"Rudi minum 2/3 botol susu. Jika 1 botol 3/4 liter, berapa liter susu yang telah diminum Rudi?",
+ A:"1/3 liter",B:"6/12 liter",C:"3/8 liter",b:"B"},
+{q:"Ibu punya 4/5 kg tepung yang akan dibagi dalam beberapa kantong. Setiap kantong diisi dengan 2/5 kg tepung. Berapa banyak kantong tepung setelah dibagi?",
+ A:"4 kantong",B:"8/25 kantong",C:"2 kantong",b:"C"}
+]
+};
+
+/* ================= ELEMEN ================= */
+const welcome = document.getElementById("welcome");
+const nav = document.getElementById("nav");
+const book = document.getElementById("book");
+const page = document.getElementById("page");
+const ggb = document.getElementById("ggb");
+const ggbBox = document.getElementById("ggb-container");
+const quizBox = document.getElementById("quiz");
+const penutup = document.getElementById("penutup");
+
+/* ================= MULAI ================= */
+function mulai(){
+  step = 1;
+  welcome.style.display="none";
+  nav.style.display="flex";
+  book.style.display="flex";
+  update();
+}
+
+/* ================= NAV ================= */
+function next(){
+  if(modeSoal) return;
+
+  step++;
+  update();
+
+  if(soal[step-1]){
+    mulaiSoal(step-1);
+  }
+}
+
+function prev(){
+  if(step>1){
+    step--;
+    update();
+  }
+}
+
+/* ================= UPDATE ================= */
+function update(){
+  quizBox.style.display="none";
+
+  if(step===17 && !modeSoal){
+    mulaiSoal(17);
+    return;
+  }
+
+  if(geogebra[step]){
+    page.style.display="none";
+    ggbBox.style.display="flex";
+    ggb.src = geogebra[step];
+  }else{
+    ggbBox.style.display="none";
+    page.style.display="block";
+    page.src = pages[step];
+  }
+}
+
+/* ================= SOAL ================= */
+function mulaiSoal(kode){
+  setAktif = kode;
+  soalIndex = 0;
+  salah = 0;
+  modeSoal = true;
+
+  book.style.display="none";
+  quizBox.style.display="flex";
+  tampilSoal();
+}
+
+function tampilSoal(){
+  const s = soal[setAktif][soalIndex];
+  qText.innerText = s.q;
+  optA.innerText = "A. "+s.A;
+  optB.innerText = "B. "+s.B;
+  optC.innerText = "C. "+s.C;
+  feedback.innerText="";
+  nextSoalBtn.style.display="none";
+}
+
+function jawab(p){
+  const s = soal[setAktif][soalIndex];
+  if(p===s.b){
+    soalIndex++;
+    salah = 0;
+
+    if(soalIndex<3){
+      tampilSoal();
+    }else{
+      feedback.innerText = ["🌟 Kerja Bagus!","🔥 Keren!","🚀 Luar Biasa!"][Math.floor(Math.random()*3)];
+      nextSoalBtn.style.display="block";
+    }
+  }else{
+    salah++;
+    feedback.innerText="❌ Jawaban salah";
+    if(salah>=2){
+      modeSoal=false;
+      quizBox.style.display="none";
+      book.style.display="flex";
+      step--;
+      update();
+    }
+  }
+}
+
+function lanjutSet(){
+  modeSoal=false;
+  quizBox.style.display="none";
+
+  if(setAktif===17){
+    nav.style.display="none";
+    penutup.style.display="flex";
+  }else{
+    book.style.display="flex";
+  }
+}
+</script>
+</body>
+</html>

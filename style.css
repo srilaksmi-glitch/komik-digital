@@ -1,0 +1,81 @@
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#d0b5f7ab;
+  text-align:center;
+}
+
+/* ===== PEMBUKA ===== */
+#welcome{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:25px;
+}
+
+/* ===== NAV ===== */
+#nav{
+  display:none;
+  justify-content:space-between;
+  padding:20px 40px;
+}
+
+/* ===== BUKU ===== */
+#book{
+  min-height:85vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* ===== GAMBAR KOMIK (TENGAH) ===== */
+#page{
+  max-width:90%;
+  max-height:85vh;
+  margin:auto;
+  display:block;
+  border: radius 18px;
+  box-shadow:0 1px 25px rgba(146, 38, 218, 0.15);
+  transition:transform .6s ease;
+}
+
+/* ===== GEOGEBRA ===== */
+#ggb-container{
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+
+#ggb{
+  width:90%;
+  max-width:900px;
+  height:80vh;
+  border-radius:12px;
+}
+
+/* ===== SOAL ===== */
+#quiz{
+  min-height:100vh;
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:15px;
+}
+
+#quiz button{
+  width:100%;
+  max-width:450px;
+  padding:14px;
+  text-align:left;
+}
+
+/* ===== PENUTUP ===== */
+#penutup{
+  min-height:100vh;
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  gap:10px;
+}
